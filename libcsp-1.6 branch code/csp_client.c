@@ -29,6 +29,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <csp/drivers/can_socketcan.h>
 #include <csp/interfaces/csp_if_zmqhub.h>
 
+char* get_message(char *string);
+
 /* Server port, the port the server listens on for incoming connections from the client. */
 #define MY_SERVER_PORT		10
 
@@ -37,7 +39,11 @@ static uint8_t server_address = 255;
 
 /* test mode, used for verifying that host & client can exchange packets over the loopback interface */
 static bool test_mode = false;
-static unsigned int server_received = 0;
+static unsigned int successful_ping = 0;
+
+/*message mode*/
+static bool message_mode = false;
+static char * message;
 
 /* Client task sending requests to server task */
 CSP_DEFINE_TASK(task_client) {
@@ -53,10 +59,9 @@ CSP_DEFINE_TASK(task_client) {
 		/* Send ping to server, timeout 1000 mS, ping size 100 bytes */
 		int result = csp_ping(server_address, 1000, 100, CSP_O_NONE);
 		csp_log_info("Ping address: %u, result %d [mS]", server_address, result);
-
-		/* Send reboot request to server, the server has no actual implementation of csp_sys_reboot() and fails to reboot */
-		//csp_reboot(server_address);
-		//csp_log_info("reboot system request sent to address: %u", server_address);
+        if (result > 0) {
+            ++successful_ping;
+        }
 
 		/* Send data packet (string) to server */
 
@@ -77,7 +82,14 @@ CSP_DEFINE_TASK(task_client) {
 		}
 
 		/* 3. Copy data to packet */
-		snprintf((char *) packet->data, csp_buffer_data_size(), "Hello World (%u)", ++count);
+        if(message_mode){
+            csp_log_info("Message to send: ");
+            message = get_message(message);
+            snprintf((char *) packet->data, csp_buffer_data_size(), "%s" , message);
+            free(message);
+        } else {
+		    snprintf((char *) packet->data, csp_buffer_data_size(), "Hello World (%u)", ++count);
+        }
 
 		/* 4. Set packet length */
 		packet->length = (strlen((char *) packet->data) + 1); /* include the 0 termination */
@@ -111,7 +123,7 @@ int main(int argc, char * argv[]) {
 #endif
     const char * rtable = NULL;
     int opt;
-    while ((opt = getopt(argc, argv, "a:d:r:c:k:z:tR:h")) != -1) {
+    while ((opt = getopt(argc, argv, "a:d:r:c:k:z:tR:mh")) != -1) {
         switch (opt) {
             case 'a':
                 address = atoi(optarg);
@@ -141,6 +153,9 @@ int main(int argc, char * argv[]) {
             case 'R':
                 rtable = optarg;
                 break;
+            case 'm':
+                message_mode = true;
+                break;
             default:
                 printf("Usage:\n"
                        " -a <address>     local CSP address\n"
@@ -150,6 +165,7 @@ int main(int argc, char * argv[]) {
                        " -k <kiss-device> add KISS device (serial)\n"
                        " -z <zmq-device>  add ZMQ device, e.g. \"localhost\"\n"
                        " -R <rtable>      set routing table\n"
+                       " -m               enable message mode\n"
                        " -t               enable test mode\n");
                 exit(1);
                 break;
@@ -245,11 +261,11 @@ int main(int argc, char * argv[]) {
 
         if (test_mode) {
             /* Test mode is intended for checking that host & client can exchange packets over loopback */
-            if (server_received < 5) {
-                csp_log_error("Server received %u packets", server_received);
+            if (successful_ping < 5) {
+                csp_log_info("Client successfully pinged the server %u times\n", successful_ping);
                 exit(1);
             }
-            csp_log_info("Server received %u packets", server_received);
+            csp_log_info("Client successfully pinged the server %u times\n", successful_ping);
             exit(0);
         }
     }

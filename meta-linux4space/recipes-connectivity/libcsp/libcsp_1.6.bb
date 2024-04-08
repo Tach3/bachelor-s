@@ -1,8 +1,11 @@
 SUMMARY = "recipe to install libcsp"
+<<<<<<< HEAD
 DESCRIPTION = "CubeSat protocol library writte in C and built with waf. \
                This recipe is for latest stable release libcsp 1.6. \
                Definition of drivers is required in .bbappend file \
                "
+=======
+>>>>>>> 49619023192df66af20800ac4711c8df4f483e0b
 HOMEPAGE = "https://www.libcsp.org"
 SECTION = "libs"
 LICENSE = "LGPL-2.1-only"
@@ -13,10 +16,13 @@ SRC_URI = "git://github.com/libcsp/libcsp.git;branch=libcsp-1;protocol=https"
 SRCREV = "87006959696c78f70535ab382b0bcd4cb5a6558d"
 S = "${WORKDIR}/git"
 
+<<<<<<< HEAD
 # Custom config variables. Modify in .bbappend.
 DRIVERS = ""
 FLAGS = ""
 
+=======
+>>>>>>> 49619023192df66af20800ac4711c8df4f483e0b
 inherit pkgconfig
 
 do_configure() {
@@ -28,7 +34,11 @@ do_configure() {
     
     # Execute the modified scripts
     cd ${S}
+<<<<<<< HEAD
     ./waf configure --toolchain=${TARGET_SYS} --with-os=posix ${DRIVERS} --enable-shlib --prefix=/usr --install-csp ${FLAGS}
+=======
+    ./waf configure --toolchain=arm-linux --with-os=posix --with-driver-usart=linux --enable-can-socketcan --enable-if-zmqhub --enable-shlib --prefix=/usr --install-csp --enable-python3-bindings
+>>>>>>> 49619023192df66af20800ac4711c8df4f483e0b
 }
 
 do_install() {
@@ -40,5 +50,10 @@ do_install() {
 PACKAGES = "${PN} ${PN}-dev ${PN}-dbg"
 
 FILES:${PN} += "${libdir}/*"
+<<<<<<< HEAD
 FILES:${PN}-dbg += "${libdir}/.debug/"
 FILES:${PN}-dev += "${includedir}"
+=======
+FILES_${PN}-dbg += "${libdir}/.debug/"
+FILES_${PN}-dev += "${includedir}"
+>>>>>>> 49619023192df66af20800ac4711c8df4f483e0b
