@@ -59,6 +59,11 @@ CSP_DEFINE_TASK(task_client) {
 		/* Send ping to server, timeout 1000 mS, ping size 100 bytes */
 		int result = csp_ping(server_address, 1000, 100, CSP_O_NONE);
 		csp_log_info("Ping address: %u, result %d [mS]", server_address, result);
+
+        /* Send reboot request to server, the server has no actual implementation of csp_sys_reboot() and fails to reboot */
+        //csp_reboot(server_address);
+        //csp_log_info("reboot system request sent to address: %u", server_address);
+
         if (result > 0) {
             ++successful_ping;
         }
