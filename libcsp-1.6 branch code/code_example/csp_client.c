@@ -17,6 +17,9 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
+/*
+Code has been modified, from csp_server_client.c into this. 10.04.2024
+*/
 
 #include <stdio.h>
 #include <string.h>
