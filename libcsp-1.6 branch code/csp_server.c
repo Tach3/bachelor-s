@@ -39,6 +39,8 @@ static uint8_t server_address = 255;
 static bool test_mode = false;
 static unsigned int server_received = 0;
 
+void is_command(csp_packet_t *packet);
+
 /* Server task - handles requests from clients */
 CSP_DEFINE_TASK(task_server) {
 
@@ -69,7 +71,8 @@ CSP_DEFINE_TASK(task_server) {
 			switch (csp_conn_dport(conn)) {
 			case MY_SERVER_PORT:
 				/* Process packet here */
-				csp_log_info("Packet received on MY_SERVER_PORT: %s", (char *) packet->data);
+				//csp_log_info("Packet received on MY_SERVER_PORT: %s", (char *) packet->data);
+                is_command(packet);
 				csp_buffer_free(packet);
 				++server_received;
 				break;

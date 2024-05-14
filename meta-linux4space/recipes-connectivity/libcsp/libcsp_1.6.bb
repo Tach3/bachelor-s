@@ -6,7 +6,7 @@ DESCRIPTION = "CubeSat protocol library writte in C and built with waf. \
 HOMEPAGE = "https://www.libcsp.org"
 SECTION = "libs"
 LICENSE = "LGPL-2.1-only"
-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/LGPL-2.1-only;md5=1a6d268fd218675ffea8be556788b780"
+LIC_FILES_CHKSUM = "file://COPYING;md5=e438dd14b228d54d2cd2d56df9a3ff18"
 DEPENDS = "python3"
 PV = "1.6"
 SRC_URI = "git://github.com/libcsp/libcsp.git;branch=libcsp-1;protocol=https"
@@ -14,10 +14,8 @@ SRCREV = "87006959696c78f70535ab382b0bcd4cb5a6558d"
 S = "${WORKDIR}/git"
 
 # Custom config variables. Modify in .bbappend.
-OS = ""
 DRIVERS = ""
-FLAGS = ""
-INSTALL_LOCATION = ""
+FLAGS = "--enable-python3-bindings --enable-crc32"
 
 inherit pkgconfig
 
@@ -30,7 +28,7 @@ do_configure() {
     
     # Execute the modified scripts
     cd ${S}
-    ./waf configure --toolchain=${TARGET_SYS} ${OS} ${DRIVERS} --enable-shlib ${INSTALL_LOCATION} --install-csp ${FLAGS}
+    ./waf configure --toolchain=${TARGET_SYS} --with-os=posix ${DRIVERS} --enable-shlib --prefix=/usr --install-csp ${FLAGS}
 }
 
 do_install() {
